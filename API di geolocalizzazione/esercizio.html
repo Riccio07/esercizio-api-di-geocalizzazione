@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocalizzazione Semplice</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>La tua Posizione</h1>
+    <button id="startTracking">Avvia</button>
+    <button id="stopTracking" disabled>Ferma</button>
+    <div id="output">
+        <p>Posizione: <span id="position">N/D</span></p>
+    </div>
+
+    <script>
+        const startTrackingButton = document.getElementById('startTracking');
+        const stopTrackingButton = document.getElementById('stopTracking');
+        const positionOutput = document.getElementById('position');
+
+        let watchId = null;
+
+        startTrackingButton.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        positionOutput.textContent = `Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`;
+                    },
+                    (error) => {
+                        positionOutput.textContent = `Errore: ${error.message}`;
+                    }
+                );
+                startTrackingButton.disabled = true;
+                stopTrackingButton.disabled = false;
+            } else {
+                positionOutput.textContent = 'Geolocalizzazione non supportata.';
+            }
+        });
+
+        stopTrackingButton.addEventListener('click', () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                positionOutput.textContent = 'Tracciamento interrotto.';
+            }
+            startTrackingButton.disabled = false;
+            stopTrackingButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
